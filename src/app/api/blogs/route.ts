@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { connection, NextRequest, NextResponse } from "next/server";
 
 import { getBlogs } from "@/lib/payload/blogs";
 import { getCategoryBySlug } from "@/lib/payload/categories";
 
 export async function GET(request: NextRequest) {
+  await connection();
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const page = Number(searchParams.get("page") ?? "1");
