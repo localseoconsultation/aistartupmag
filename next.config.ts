@@ -9,12 +9,15 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   images: {
-    dangerouslyAllowLocalIP: true,
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3000",
+        protocol: "https",
+        hostname: "cms-aistartupmag.vercel.app",
+        pathname: "/api/media/file/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cms.aistartupmag.com",
         pathname: "/api/media/file/**",
       },
     ],
