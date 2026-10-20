@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme {
+  /* Base */
+  --color-background: #f5f5f2;
+  --color-foreground: #0a0a0a;
+
+  --color-secondary-backgound: #e9e4da80;
+  
+  /* UI */
+  --color-muted: #8a8a8a;
+  --color-border: #d8d8d3;
+
+  /* Brand */
+  --color-primary: #ff6000;
+  --color-primary-foreground: #0a0a0a;
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-dark: #0a0a0a;
+
+  /* Fonts */
+  --font-primary: var(--font-inter);
+}
+
+@layer components {
+  .contact-input {
+    @apply h-12 w-full border border-foreground/15 bg-transparent px-4 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .contact-input::placeholder {
+    color: var(--muted-foreground);
+  }
+}
+
+@layer components {
+  .blog-content {
+    @apply w-full min-w-0;
+    overflow-wrap: break-word;
+  }
+
+  /* Paragraphs */
+  .blog-content p {
+    @apply my-6 text-base leading-relaxed text-foreground md:text-lg;
+  }
+
+  /* Headings */
+  .blog-content h2 {
+    @apply mt-14 mb-5 text-3xl font-semibold leading-[1.05] tracking-[-0.03em] md:text-4xl lg:text-5xl;
+  }
+
+  .blog-content h3 {
+    @apply mt-10 mb-4 text-2xl font-semibold leading-tight tracking-[-0.03em] md:text-3xl;
+  }
+
+  /* Links */
+  .blog-content a {
+    @apply text-primary hover:underline hover:underline-offset-4;
+  }
+
+  /* Blockquotes */
+  .blog-content blockquote {
+    @apply my-10 border-l-2 border-primary py-2 pl-6;
+  }
+
+  .blog-content blockquote p {
+    @apply my-3;
+  }
+
+  /* Lists */
+  .blog-content ul,
+  .blog-content ol {
+    @apply my-6 pl-6;
+  }
+
+  .blog-content ul {
+    @apply list-disc;
+  }
+
+  .blog-content ol {
+    @apply list-decimal;
+  }
+
+  .blog-content li {
+    @apply my-2 pl-2;
+  }
+
+  /* Images */
+  .blog-content img {
+    @apply my-10 block h-auto max-w-full;
+  }
+
+  /* Remove unnecessary outer spacing */
+  .blog-content > *:first-child {
+    @apply mt-0;
+  }
+
+  .blog-content > *:last-child {
+    @apply mb-0;
+  }
+}
+
+body {
+  font-family: var(--font-primary), var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+main {
+  margin-top: 96px;
+}
+
+p {
+  font-family: var(--font-primary), var(--font-sans);
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font-family: var(--font-primary), var(--font-sans);
+}
