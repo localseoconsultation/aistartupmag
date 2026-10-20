@@ -149,10 +149,7 @@ export default function CustomCodeInjector({
 
         document.documentElement.setAttribute(`data-${marker}`, "true");
 
-        console.info(`[CustomCode] ${id}: injection completed`);
       } catch (error) {
-        console.error(`[CustomCode] ${id}: injection failed`, error);
-
         // Allow a later attempt if injection failed.
         document.documentElement.removeAttribute(`data-${marker}`);
       }

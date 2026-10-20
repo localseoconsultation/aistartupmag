@@ -21,7 +21,6 @@ export default function CustomCodeGuard({ expected }: { expected: Expected }) {
     });
 
     if (problems.length) {
-      console.error("[CustomCode] placement check failed:", problems);
       navigator.sendBeacon?.("/api/custom-code-report", JSON.stringify(problems)); // optional
     }
   }, [expected]);
