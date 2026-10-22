@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 import BlogPost from "@/components/pages/blog/individual/BlogPost";
@@ -54,28 +55,50 @@ export async function generateMetadata({
       index: true,
       follow: true,
     },
-
     openGraph: {
       type: "article",
       url: canonicalUrl,
       siteName: defaultSEO.SITE_NAME,
-      title: content.title,
-      description: content.excerpt,
+      title,
+      description,
       ...(featuredImage ? { images: [{ url: featuredImage }] } : {}),
       ...(content.publishedAt ? { publishedTime: content.publishedAt } : {}),
       ...(content.updatedAt ? { modifiedTime: content.updatedAt } : {}),
     },
-
     twitter: {
       card: "summary_large_image",
-      title: content.title,
-      description: content.excerpt,
+      title,
+      description,
       ...(featuredImage ? { images: [featuredImage] } : {}),
     },
   };
 }
 
-const BlogPostPage = async ({ params }: BlogPostPageProps) => {
+async function BlogPostExtras({
+  categoryIds,
+  blogId,
+}: {
+  categoryIds: number[];
+  blogId: number;
+}) {
+  const [relatedBlogs, newsletter] = await Promise.all([
+    getRelatedBlogs(categoryIds, blogId),
+    getNewsletter(),
+  ]);
+
+  return (
+    <>
+      <RelatedBlogs blogs={relatedBlogs} />
+      <NewsletterSection data={newsletter} />
+    </>
+  );
+}
+
+function BlogPostExtrasFallback() {
+  return <div className="min-h-40" aria-hidden="true" />;
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const content = await getBlogBySlug(slug);
 
@@ -85,18 +108,13 @@ const BlogPostPage = async ({ params }: BlogPostPageProps) => {
 
   const categoryIds = content.categories.map((category) => category.id);
 
-  const [relatedBlogs, newsletter] = await Promise.all([
-    getRelatedBlogs(categoryIds, content.id),
-    getNewsletter(),
-  ]);
-
   return (
     <main>
       <BlogPost blog={content} />
-      <RelatedBlogs blogs={relatedBlogs} />
-      <NewsletterSection data={newsletter} />
+
+      <Suspense fallback={<BlogPostExtrasFallback />}>
+        <BlogPostExtras categoryIds={categoryIds} blogId={content.id} />
+      </Suspense>
     </main>
   );
-};
-
-export default BlogPostPage;
+}

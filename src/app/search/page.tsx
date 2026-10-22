@@ -49,16 +49,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-
     alternates: {
       canonical: canonicalUrl,
     },
-
     robots: {
       index: seo?.noIndex === true ? false : true,
       follow: !seo?.noFollow,
     },
-
     openGraph: {
       type: "website",
       url: canonicalUrl,
@@ -67,7 +64,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description: ogDescription,
       ...(ogImage ? { images: [{ url: ogImage }] } : {}),
     },
-
     twitter: {
       card: seo?.twitterCard || "summary_large_image",
       title: twitterTitle,
@@ -92,11 +88,39 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const category = params.category ?? "";
   const hasSearch = Boolean(query || category);
 
-  const [search, categories, blogs] = await Promise.all([
+  const [search, categories] = await Promise.all([
     getCachedSearchPage(),
     getCategories(),
-    getBlogs(),
   ]);
+
+  // Search requests don't need the initial 15-blog listing.
+  if (hasSearch) {
+    return (
+      <main>
+        <SearchHero data={search.hero} />
+
+        <SearchForm
+          categories={categories.docs}
+          query={query}
+          selectedCategory={category}
+        />
+
+        <Suspense
+          key={`${query}-${category}-${params.page ?? "1"}`}
+          fallback={<SearchResultsSkeleton />}
+        >
+          <SearchResultsContent
+            query={query}
+            category={category}
+            page={params.page}
+          />
+        </Suspense>
+      </main>
+    );
+  }
+
+  // Fetch blogs only when displaying the default listing.
+  const blogs = await getBlogs();
 
   const sortedCategories = sortCategoriesByBlogCount(
     categories.docs,
@@ -113,25 +137,12 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
         selectedCategory={category}
       />
 
-      {hasSearch ? (
-        <Suspense
-          key={`${query}-${category}-${params.page ?? "1"}`}
-          fallback={<SearchResultsSkeleton />}
-        >
-          <SearchResultsContent
-            query={query}
-            category={category}
-            page={params.page}
-          />
-        </Suspense>
-      ) : (
-        <AllPosts
-          categories={sortedCategories}
-          blogs={blogs.docs}
-          hasNextPage={blogs.hasNextPage}
-          nextPage={blogs.nextPage}
-        />
-      )}
+      <AllPosts
+        categories={sortedCategories}
+        blogs={blogs.docs}
+        hasNextPage={blogs.hasNextPage}
+        nextPage={blogs.nextPage}
+      />
     </main>
   );
 };
@@ -148,6 +159,7 @@ const SearchResultsContent = async ({
   page: pageParam,
 }: SearchResultsContentProps) => {
   const requestedPage = Number(pageParam ?? "1");
+
   const page =
     Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 
